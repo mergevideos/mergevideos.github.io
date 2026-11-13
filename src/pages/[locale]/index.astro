@@ -1,0 +1,24 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import MergePageContent from '../../components/MergePageContent.astro';
+import { defaultLocale, locales, type Locale } from '../../i18n/ui';
+
+export function getStaticPaths() {
+  return locales
+    .filter((loc) => loc !== defaultLocale)
+    .map((locale) => ({
+      params: { locale },
+      props: { locale },
+    }));
+}
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+---
+
+<BaseLayout locale={locale}>
+  <MergePageContent locale={locale} />
+</BaseLayout>

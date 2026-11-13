@@ -1,0 +1,209 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  /* Palette Tokens */
+  --mv-emerald: #00AF91;
+  --mv-forest: #007965;
+  --mv-tangerine: #F58634;
+  --mv-sunshine: #FFCC29;
+  --mv-light-bg: #F8FFFD;
+  --mv-white: #FFFFFF;
+  --mv-night: #0D1B18;
+
+  /* Light Mode Default */
+  --bg-primary: #F8FFFD;
+  --bg-surface: #FFFFFF;
+  --bg-workspace: #FFFFFF;
+  --bg-subtle: #EFFBF7;
+  --btn-primary-bg: #007965;
+  --btn-primary-hover: #00AF91;
+  --btn-primary-text: #FFFFFF;
+  --cta-accent-bg: #F58634;
+  --cta-accent-hover: #FFCC29;
+  --badge-bg: #FFCC29;
+  --badge-text: #0D1B18;
+  --border-color: #00AF91;
+  --border-soft: rgba(0, 175, 145, 0.28);
+  --text-primary: #007965;
+  --text-secondary: #00AF91;
+  --text-body: #0D1B18;
+  --shadow-workspace: 0 20px 50px -18px rgba(0, 121, 101, 0.16);
+  --shadow-card: 0 8px 24px -10px rgba(0, 121, 101, 0.14);
+}
+
+html.dark {
+  --bg-primary: #0D1B18;
+  --bg-surface: #132A25;
+  --bg-workspace: #16302A;
+  --bg-subtle: #0F231E;
+  --btn-primary-bg: #00AF91;
+  --btn-primary-hover: #FFCC29;
+  --btn-primary-text: #0D1B18;
+  --cta-accent-bg: #F58634;
+  --cta-accent-hover: #FFCC29;
+  --badge-bg: #007965;
+  --badge-text: #FFFFFF;
+  --border-color: #00AF91;
+  --border-soft: rgba(0, 175, 145, 0.36);
+  --text-primary: #FFFFFF;
+  --text-secondary: #FFCC29;
+  --text-body: #E9FBF7;
+  --shadow-workspace: 0 24px 60px -18px rgba(0, 0, 0, 0.55);
+  --shadow-card: 0 10px 28px -10px rgba(0, 0, 0, 0.45);
+}
+
+html {
+  scroll-behavior: smooth;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Hiragino Sans', 'Noto Sans JP', 'Noto Sans SC', 'Helvetica Neue', Arial, sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 240ms ease, color 240ms ease;
+}
+
+/* First-fold hero sizing */
+.mv-hero-viewport {
+  min-height: calc(100dvh - 4.5rem);
+}
+
+@media (min-width: 768px) {
+  .mv-hero-viewport {
+    min-height: calc(100dvh - 5rem);
+  }
+}
+
+.mv-h1 {
+  font-size: clamp(2rem, 4vw, 3.25rem);
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+}
+
+/* Primary action buttons */
+.mv-btn-primary {
+  background-color: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
+  transition: background-color 200ms ease, color 200ms ease, transform 180ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 200ms ease;
+}
+
+.mv-btn-primary:hover:not(:disabled) {
+  background-color: var(--btn-primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px -8px rgba(0, 175, 145, 0.45);
+}
+
+.mv-btn-primary:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* Support CTA Accent Button */
+.mv-cta-support {
+  background-color: var(--cta-accent-bg);
+  color: #FFFFFF;
+  border: 2px solid transparent;
+  transition: transform 180ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 220ms ease, border-color 220ms ease, background-color 220ms ease;
+}
+
+.mv-cta-support:hover {
+  border-color: var(--cta-accent-hover);
+  box-shadow: 0 0 22px rgba(255, 204, 41, 0.72), 0 8px 20px -6px rgba(245, 134, 52, 0.55);
+  transform: translateY(-1px);
+}
+
+/* Smooth animations */
+@keyframes mvFloat {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-7px);
+  }
+}
+
+@keyframes mvPulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(245, 134, 52, 0.28);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(245, 134, 52, 0);
+  }
+}
+
+@keyframes mvFadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes mvShimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
+}
+
+.mv-float {
+  animation: mvFloat 3.6s ease-in-out infinite;
+}
+
+.mv-drag-pulse {
+  animation: mvPulseGlow 1.5s ease-in-out infinite;
+}
+
+.mv-enter {
+  animation: mvFadeSlideUp 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.mv-progress-fill {
+  background: linear-gradient(90deg, #00AF91 0%, #F58634 50%, #FFCC29 75%, #00AF91 100%);
+  background-size: 200% 100%;
+  animation: mvShimmer 2.2s linear infinite;
+  transition: width 260ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Custom slim scrollbar for storyboard strip */
+.mv-scrollbar::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+
+.mv-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.mv-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(0, 175, 145, 0.35);
+  border-radius: 9999px;
+}
+
+.mv-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 175, 145, 0.65);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mv-float,
+  .mv-drag-pulse,
+  .mv-enter,
+  .mv-progress-fill {
+    animation: none !important;
+  }
+  * {
+    transition-duration: 0.01ms !important;
+  }
+}

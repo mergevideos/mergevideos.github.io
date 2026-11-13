@@ -1,0 +1,32 @@
+---
+import type { Locale } from '../i18n/ui';
+import { useTranslations } from '../i18n/utils';
+import VideoMerger from './VideoMerger';
+import BelowFoldSections from './BelowFoldSections.astro';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+---
+
+<!-- 100% of first viewport (100dvh) dedicated strictly to primary H1 + Video Merger Box Div -->
+<section
+  class="mv-hero-viewport flex flex-col items-center justify-center px-3 sm:px-6 lg:px-8 py-4 sm:py-6"
+>
+  <div class="w-full max-w-5xl mx-auto flex flex-col items-center">
+    <h1
+      class="mv-h1 text-center font-black tracking-tight mb-4 sm:mb-7"
+      style="color: var(--text-primary);"
+    >
+      {t.hero.title}
+    </h1>
+
+    <VideoMerger client:load messages={t.merger} />
+  </div>
+</section>
+
+<!-- Below-the-fold SEO & FAQ content -->
+<BelowFoldSections locale={locale} />

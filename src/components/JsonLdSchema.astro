@@ -1,0 +1,89 @@
+---
+import { localeMeta, type Locale } from '../i18n/ui';
+import { getLocalizedPath, useTranslations } from '../i18n/utils';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+const meta = localeMeta[locale];
+const siteOrigin = (Astro.site?.toString() || 'https://mergevideos.github.io').replace(/\/$/, '');
+const canonicalUrl = `${siteOrigin}${getLocalizedPath(locale, '/')}`;
+
+const jsonLdGraph = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebApplication',
+      '@id': `${canonicalUrl}#webapp`,
+      name: t.seo.appSchemaName,
+      url: canonicalUrl,
+      description: t.seo.description,
+      applicationCategory: 'MultimediaApplication',
+      operatingSystem: 'All (iOS, Android, Windows, macOS, Linux)',
+      browserRequirements: 'Requires HTML5 and WebAssembly',
+      inLanguage: meta.htmlLang,
+      isAccessibleForFree: true,
+      offers: {
+        '@type': 'Offer',
+        price: '0.00',
+        priceCurrency: 'USD',
+      },
+    },
+    {
+      '@type': 'HowTo',
+      '@id': `${canonicalUrl}#howto`,
+      name: t.seo.howToSchemaName,
+      inLanguage: meta.htmlLang,
+      step: t.belowFold.howSteps.map((step, index) => ({
+        '@type': 'HowToStep',
+        position: index + 1,
+        name: step.title,
+        text: step.description,
+        url: `${canonicalUrl}#how-it-works`,
+      })),
+    },
+    {
+      '@type': 'FAQPage',
+      '@id': `${canonicalUrl}#faq`,
+      inLanguage: meta.htmlLang,
+      mainEntity: t.belowFold.faqs.map((faq) => ({
+        '@type': 'Question',
+        name: faq.question,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: faq.answer,
+        },
+      })),
+    },
+    {
+      '@type': 'BreadcrumbList',
+      '@id': `${canonicalUrl}#breadcrumb`,
+      itemListElement: [
+        {
+          '@type': 'ListItem',
+          position: 1,
+          name: t.belowFold.breadcrumbHome,
+          item: canonicalUrl,
+        },
+        {
+          '@type': 'ListItem',
+          position: 2,
+          name: t.belowFold.breadcrumbTools,
+          item: `${canonicalUrl}#tools`,
+        },
+        {
+          '@type': 'ListItem',
+          position: 3,
+          name: t.belowFold.breadcrumbCurrent,
+          item: canonicalUrl,
+        },
+      ],
+    },
+  ],
+};
+---
+
+<script type="application/ld+json" set:html={JSON.stringify(jsonLdGraph)} />

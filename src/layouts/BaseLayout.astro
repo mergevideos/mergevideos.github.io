@@ -1,0 +1,118 @@
+---
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import JsonLdSchema from '../components/JsonLdSchema.astro';
+import { localeMeta, locales, type Locale } from '../i18n/ui';
+import { getAlternateLinks, getLocalizedPath, useTranslations } from '../i18n/utils';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+const meta = localeMeta[locale];
+const siteOrigin = (Astro.site?.toString() || 'https://mergevideos.github.io').replace(/\/$/, '');
+const canonicalUrl = `${siteOrigin}${getLocalizedPath(locale, '/')}`;
+const alternates = getAlternateLinks(siteOrigin, '/');
+const ogImageUrl = `${siteOrigin}/og-image.png`;
+const alternateOgLocales = locales
+  .filter((loc) => loc !== locale)
+  .map((loc) => localeMeta[loc].ogLocale);
+---
+
+<!doctype html>
+<html lang={meta.htmlLang}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{t.seo.title}</title>
+    <meta name="description" content={t.seo.description} />
+    <meta name="keywords" content={t.seo.keywords} />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <link rel="canonical" href={canonicalUrl} />
+    <link rel="sitemap" type="application/xml" title="Sitemap" href={`${siteOrigin}/sitemap.xml`} />
+
+    {
+      alternates.map((alt) => (
+        <link rel="alternate" hreflang={alt.hreflang} href={alt.href} />
+      ))
+    }
+    <link rel="alternate" hreflang="x-default" href={`${siteOrigin}/`} />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:title" content={t.seo.title} />
+    <meta property="og:description" content={t.seo.description} />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={t.seo.ogImageAlt} />
+    <meta property="og:locale" content={meta.ogLocale} />
+    {
+      alternateOgLocales.map((ogLoc) => (
+        <meta property="og:locale:alternate" content={ogLoc} />
+      ))
+    }
+    <meta property="og:site_name" content="MergeVideos" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={t.seo.title} />
+    <meta name="twitter:description" content={t.seo.description} />
+    <meta name="twitter:image" content={ogImageUrl} />
+    <meta name="twitter:image:alt" content={t.seo.ogImageAlt} />
+
+    <!-- PWA & Icons -->
+    <meta name="theme-color" content="#007965" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+
+    <!-- Google Tag Manager & Google Analytics 4 -->
+    <script is:inline async src="https://www.googletagmanager.com/gtm.js?id=GTM-NDP5XC2F"></script>
+    <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-JSCQLBDWHS"></script>
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-JSCQLBDWHS');
+    </script>
+
+    <!-- Strict Zero-Fake-Rating Structured Data (WebApplication, HowTo, FAQPage, BreadcrumbList) -->
+    <JsonLdSchema locale={locale} />
+
+    <!-- Theme initialization before first paint (Light mode default) -->
+    <script is:inline>
+      try {
+        if (localStorage.getItem('mv-theme') === 'dark') {
+          document.documentElement.classList.add('dark');
+        }
+      } catch {}
+    </script>
+  </head>
+  <body class="antialiased selection:bg-[#FFCC29] selection:text-[#0D1B18]">
+    <noscript>
+      <iframe
+        src="https://www.googletagmanager.com/ns.html?id=GTM-NDP5XC2F"
+        height="0"
+        width="0"
+        style="display:none;visibility:hidden"
+        title="Google Tag Manager"
+      ></iframe>
+    </noscript>
+    <Header locale={locale} />
+    <main>
+      <slot />
+    </main>
+
+    <script is:inline>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch(() => {});
+        });
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,269 @@
+---
+import { localeMeta, locales, type Locale } from '../i18n/ui';
+import { getLocalizedPath, useTranslations } from '../i18n/utils';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+const homeUrl = getLocalizedPath(locale, '/');
+---
+
+<section
+  id="tools"
+  class="border-t px-4 sm:px-6 lg:px-8 py-14 sm:py-20"
+  style="border-color: var(--border-soft); background-color: var(--bg-surface);"
+>
+  <div class="mx-auto max-w-5xl space-y-16">
+    <!-- Breadcrumbs (Maps 1:1 to BreadcrumbList JSON-LD) -->
+    <nav aria-label="Breadcrumb" class="text-sm font-bold flex flex-wrap items-center gap-2">
+      <a href={homeUrl} class="hover:underline" style="color: var(--text-secondary);">
+        {t.belowFold.breadcrumbHome}
+      </a>
+      <span aria-hidden="true" class="opacity-50">/</span>
+      <a href={`${homeUrl}#tools`} class="hover:underline" style="color: var(--text-secondary);">
+        {t.belowFold.breadcrumbTools}
+      </a>
+      <span aria-hidden="true" class="opacity-50">/</span>
+      <span aria-current="page" style="color: var(--text-primary);">{t.belowFold.breadcrumbCurrent}</span>
+    </nav>
+
+    <!-- How It Works (Maps 1:1 to HowTo JSON-LD) -->
+    <section id="how-it-works" aria-labelledby="how-heading">
+      <h2
+        id="how-heading"
+        class="text-2xl sm:text-3xl font-black tracking-tight text-center mb-8"
+        style="color: var(--text-primary);"
+      >
+        {t.belowFold.howTitle}
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        {
+          t.belowFold.howSteps.map((step) => (
+            <article
+              class="rounded-2xl border-2 p-6"
+              style="background-color: var(--bg-subtle); border-color: var(--border-soft);"
+            >
+              <h3 class="text-lg sm:text-xl font-extrabold" style="color: var(--text-primary);">
+                {step.title}
+              </h3>
+              <p class="mt-2.5 text-base leading-relaxed opacity-90" style="color: var(--text-body);">
+                {step.description}
+              </p>
+            </article>
+          ))
+        }
+      </div>
+    </section>
+
+    <!-- Platform Guides: iPhone, Android, YouTube -->
+    <section aria-labelledby="guides-heading">
+      <h2
+        id="guides-heading"
+        class="text-2xl sm:text-3xl font-black tracking-tight text-center mb-8"
+        style="color: var(--text-primary);"
+      >
+        {t.belowFold.guidesTitle}
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        {
+          t.belowFold.guides.map((guide) => (
+            <article
+              class="flex flex-col rounded-2xl border-2 p-6"
+              style="background-color: var(--bg-primary); border-color: var(--border-soft);"
+            >
+              <span
+                class="self-start rounded-full px-3 py-1 text-xs font-extrabold uppercase tracking-wider mb-3"
+                style="background-color: var(--badge-bg); color: var(--badge-text);"
+              >
+                {guide.badge}
+              </span>
+              <h3 class="text-lg font-extrabold" style="color: var(--text-primary);">
+                {guide.title}
+              </h3>
+              <p class="mt-2.5 text-base leading-relaxed opacity-90" style="color: var(--text-body);">
+                {guide.description}
+              </p>
+            </article>
+          ))
+        }
+      </div>
+    </section>
+
+    <!-- Comparison Table vs Cloud Video Editors -->
+    <section aria-labelledby="comparison-heading">
+      <div class="text-center max-w-2xl mx-auto mb-8">
+        <h2
+          id="comparison-heading"
+          class="text-2xl sm:text-3xl font-black tracking-tight"
+          style="color: var(--text-primary);"
+        >
+          {t.belowFold.comparisonTitle}
+        </h2>
+        <p class="mt-2.5 text-base opacity-90" style="color: var(--text-body);">
+          {t.belowFold.comparisonSubtitle}
+        </p>
+      </div>
+      <div
+        class="overflow-x-auto rounded-2xl border-2 shadow-sm"
+        style="border-color: var(--border-color); background-color: var(--bg-primary);"
+      >
+        <table class="w-full min-w-[560px] text-left border-collapse">
+          <thead>
+            <tr style="background-color: var(--bg-subtle); border-bottom: 2px solid var(--border-soft);">
+              <th class="px-5 py-4 text-sm font-black uppercase tracking-wider" style="color: var(--text-primary);">
+                {t.belowFold.comparisonHeaders[0]}
+              </th>
+              <th class="px-5 py-4 text-sm font-black uppercase tracking-wider" style="color: var(--mv-emerald);">
+                {t.belowFold.comparisonHeaders[1]}
+              </th>
+              <th class="px-5 py-4 text-sm font-bold uppercase tracking-wider opacity-80" style="color: var(--text-body);">
+                {t.belowFold.comparisonHeaders[2]}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              t.belowFold.comparisonRows.map((row) => (
+                <tr class="border-t" style="border-color: var(--border-soft);">
+                  <th scope="row" class="px-5 py-4 text-base font-extrabold" style="color: var(--text-primary);">
+                    {row.feature}
+                  </th>
+                  <td class="px-5 py-4 text-base font-bold" style="color: var(--text-secondary);">
+                    {row.mergeVideos}
+                  </td>
+                  <td class="px-5 py-4 text-base opacity-85" style="color: var(--text-body);">
+                    {row.competitors}
+                  </td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Key Capabilities -->
+    <section aria-labelledby="features-heading">
+      <h2
+        id="features-heading"
+        class="text-2xl sm:text-3xl font-black tracking-tight text-center mb-8"
+        style="color: var(--text-primary);"
+      >
+        {t.belowFold.featuresTitle}
+      </h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        {
+          t.belowFold.features.map((feat) => (
+            <article
+              class="rounded-2xl border p-6"
+              style="background-color: var(--bg-primary); border-color: var(--border-soft);"
+            >
+              <h3 class="text-lg font-extrabold" style="color: var(--text-primary);">
+                {feat.title}
+              </h3>
+              <p class="mt-2 text-base leading-relaxed opacity-90" style="color: var(--text-body);">
+                {feat.description}
+              </p>
+            </article>
+          ))
+        }
+      </div>
+    </section>
+
+    <!-- SEO FAQ Section (Maps 1:1 to FAQPage JSON-LD) -->
+    <section id="faq" aria-labelledby="faq-heading">
+      <h2
+        id="faq-heading"
+        class="text-2xl sm:text-3xl font-black tracking-tight text-center mb-8"
+        style="color: var(--text-primary);"
+      >
+        {t.belowFold.faqTitle}
+      </h2>
+      <div class="space-y-3">
+        {
+          t.belowFold.faqs.map((item) => (
+            <details
+              class="group rounded-2xl border-2 px-5 py-4 transition-colors"
+              style="background-color: var(--bg-subtle); border-color: var(--border-soft);"
+            >
+              <summary
+                class="flex cursor-pointer list-none items-center justify-between gap-4 text-base sm:text-lg font-extrabold"
+                style="color: var(--text-primary);"
+              >
+                <span>{item.question}</span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.4"
+                  class="h-5 w-5 shrink-0 transition-transform duration-200 group-open:rotate-180"
+                  aria-hidden="true"
+                >
+                  <path d="m6 9 6 6 6-6" />
+                </svg>
+              </summary>
+              <p class="mt-3 text-base leading-relaxed opacity-90" style="color: var(--text-body);">
+                {item.answer}
+              </p>
+            </details>
+          ))
+        }
+      </div>
+    </section>
+
+    <!-- Minimal Footer -->
+    <footer
+      class="border-t pt-8 flex flex-col gap-6 text-sm font-semibold"
+      style="border-color: var(--border-soft); color: var(--text-body);"
+    >
+      <div class="flex flex-wrap items-center justify-between gap-4">
+        <span style="color: var(--text-primary); font-weight: 800;">
+          MergeVideos • {t.belowFold.footerPrivacy}
+        </span>
+        <div class="flex items-center gap-5">
+          <a
+            href="https://github.com/mergevideos/mergevideos.github.io"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="hover:underline"
+            style="color: var(--text-secondary);"
+          >
+            {t.belowFold.footerOpenSource}
+          </a>
+          <a
+            href="https://kisharadilshan.gumroad.com/coffee"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="hover:underline"
+            style="color: var(--mv-tangerine);"
+          >
+            {t.belowFold.footerSupport}
+          </a>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2">
+        {
+          locales.map((loc) => (
+            <a
+              href={getLocalizedPath(loc, '/')}
+              lang={localeMeta[loc].htmlLang}
+              class="rounded-lg border px-2.5 py-1 text-xs font-bold transition-colors hover:bg-[#00AF91]/12"
+              style={
+                loc === locale
+                  ? 'border-color: var(--mv-emerald); color: var(--mv-emerald);'
+                  : 'border-color: var(--border-soft); color: var(--text-body);'
+              }
+            >
+              {localeMeta[loc].nativeName}
+            </a>
+          ))
+        }
+      </div>
+    </footer>
+  </div>
+</section>

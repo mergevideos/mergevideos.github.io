@@ -1,5 +1,5 @@
 import { FFmpeg } from '@ffmpeg/ffmpeg';
-import { fetchFile, toBlobURL } from '@ffmpeg/util';
+import { fetchFile } from '@ffmpeg/util';
 import type { VideoClip } from './videoMetadata';
 
 export type AspectRatioPreset = 'auto' | '16:9' | '9:16' | '1:1';
@@ -38,11 +38,81 @@ export interface MergeResult {
 
 let sharedFFmpeg: FFmpeg | null = null;
 let loadPromise: Promise<FFmpeg> | null = null;
+let loadedBlobUrls: string[] = [];
+
+const DEFAULT_WASM_BYTE_ESTIMATE = 32_232_419;
 
 function throwIfAborted(signal?: AbortSignal) {
   if (signal?.aborted) {
     throw new DOMException('Merge cancelled by user', 'AbortError');
   }
+}
+
+function revokeLoadedBlobUrls() {
+  for (const url of loadedBlobUrls) {
+    try {
+      URL.revokeObjectURL(url);
+    } catch {
+      // Ignore cleanup errors
+    }
+  }
+  loadedBlobUrls = [];
+}
+
+/**
+ * Fetches a core asset and converts it to a same-origin Blob URL.
+ * Unlike @ffmpeg/util's toBlobURL, this avoids comparing decompressed stream
+ * byte counts against gzip/brotli-compressed Content-Length headers.
+ */
+async function fetchAsBlobURL(
+  url: string,
+  mimeType: string,
+  signal?: AbortSignal,
+  onProgress?: (ratio: number) => void
+): Promise<string> {
+  const resp = await fetch(url, { signal });
+  if (!resp.ok) {
+    throw new Error(`Failed to fetch FFmpeg asset (${resp.status}): ${url}`);
+  }
+
+  if (!onProgress || !resp.body || typeof resp.body.getReader !== 'function') {
+    const buf = await resp.arrayBuffer();
+    onProgress?.(1);
+    const blobUrl = URL.createObjectURL(new Blob([buf], { type: mimeType }));
+    loadedBlobUrls.push(blobUrl);
+    return blobUrl;
+  }
+
+  const contentEncoding = resp.headers.get('Content-Encoding')?.toLowerCase();
+  const isCompressed = Boolean(contentEncoding && contentEncoding !== 'identity');
+  const rawLength = Number(resp.headers.get('Content-Length') || '0');
+  const expectedTotal =
+    !isCompressed && Number.isFinite(rawLength) && rawLength > 0
+      ? rawLength
+      : DEFAULT_WASM_BYTE_ESTIMATE;
+
+  const reader = resp.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let received = 0;
+
+  while (true) {
+    throwIfAborted(signal);
+    const { done, value } = await reader.read();
+    if (done) {
+      break;
+    }
+    if (value && value.byteLength > 0) {
+      chunks.push(value);
+      received += value.byteLength;
+      const ratio = expectedTotal > 0 ? Math.min(0.98, received / expectedTotal) : 0.5;
+      onProgress(ratio);
+    }
+  }
+
+  onProgress(1);
+  const blobUrl = URL.createObjectURL(new Blob(chunks as BlobPart[], { type: mimeType }));
+  loadedBlobUrls.push(blobUrl);
+  return blobUrl;
 }
 
 export function terminateFFmpeg() {
@@ -55,6 +125,7 @@ export function terminateFFmpeg() {
     sharedFFmpeg = null;
   }
   loadPromise = null;
+  revokeLoadedBlobUrls();
 }
 
 async function ensureFFmpegLoaded(
@@ -81,16 +152,13 @@ async function ensureFFmpegLoaded(
     const coreJsSrc = `${baseOrigin}/ffmpeg/ffmpeg-core.js`;
     const coreWasmSrc = `${baseOrigin}/ffmpeg/ffmpeg-core.wasm`;
 
-    const coreURL = await toBlobURL(coreJsSrc, 'text/javascript');
+    const coreURL = await fetchAsBlobURL(coreJsSrc, 'text/javascript', signal);
     throwIfAborted(signal);
 
     onProgress?.({ stage: 'loading-engine', percent: 5 });
 
-    const wasmURL = await toBlobURL(coreWasmSrc, 'application/wasm', true, ({ received, total }) => {
-      if (total > 0) {
-        const ratio = Math.min(1, received / total);
-        onProgress?.({ stage: 'loading-engine', percent: Math.round(5 + ratio * 14) });
-      }
+    const wasmURL = await fetchAsBlobURL(coreWasmSrc, 'application/wasm', signal, (ratio) => {
+      onProgress?.({ stage: 'loading-engine', percent: Math.round(5 + ratio * 14) });
     });
 
     throwIfAborted(signal);

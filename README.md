@@ -141,7 +141,7 @@ All UI copy, SEO metadata, Open Graph locales, structured data, and navigation l
 | **UI & Styling** | `react` `^19.3.1`, `tailwindcss` `^4.3.5`, `@tailwindcss/vite` | Custom CSS design tokens, `.mv-hero-viewport`, light/dark theme variables |
 | **Type Safety** | `typescript` `^6.0.3` + `@astrojs/check` | Strict component & i18n dictionary validation (`npm run check`) |
 | **WASM Engine** | `@ffmpeg/ffmpeg` `^0.12.15`, `@ffmpeg/util` `^0.12.2`, `@ffmpeg/core` `^0.12.10` | Copied into `public/ffmpeg/` automatically via `scripts/copy-ffmpeg-core.mjs` |
-| **PWA & Offline** | [`public/manifest.webmanifest`](./public/manifest.webmanifest) + [`public/sw.js`](./public/sw.js) | Cache-first static/WASM assets + stale-while-revalidate HTML (`mergevideos-offline-v2`) |
+| **PWA & Offline** | [`public/manifest.webmanifest`](./public/manifest.webmanifest) + [`public/sw.js`](./public/sw.js) | Cache-first static/WASM assets + stale-while-revalidate HTML (`mergevideos-offline-v3`) |
 | **Sitemaps & Robots** | [`src/pages/sitemap.xml.ts`](./src/pages/sitemap.xml.ts), `@astrojs/sitemap`, [`public/robots.txt`](./public/robots.txt) | Dual `sitemap.xml` (flat W3C `<urlset>` with `xhtml:link`) and `sitemap-index.xml` |
 | **Structured Data** | [`src/components/JsonLdSchema.astro`](./src/components/JsonLdSchema.astro) | Strictly verified `@graph` (`WebApplication`, `HowTo`, `FAQPage`, `BreadcrumbList`) with zero synthetic ratings |
 | **Analytics** | [`src/layouts/BaseLayout.astro`](./src/layouts/BaseLayout.astro) | Async Google Tag Manager (`GTM-NDP5XC2F`) & Google Analytics 4 (`G-JSCQLBDWHS`) |

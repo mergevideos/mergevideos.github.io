@@ -292,6 +292,9 @@ export default function VideoMerger({ messages }: VideoMergerProps) {
       setStep('result');
     } catch (err) {
       const isCancelled = (err as Error)?.name === 'AbortError' || controller.signal.aborted;
+      if (!isCancelled) {
+        console.error('[MergeVideos] Merge failed:', err);
+      }
       setErrorMessage(isCancelled ? messages.errorCancelled : messages.errorMergeFailed);
       setStep('storyboard');
     } finally {
